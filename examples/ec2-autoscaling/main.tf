@@ -280,7 +280,7 @@ module "autoscaling" {
     
   
 
-  name = "${local.name}-${each.key}"
+  name = "${local.name}-asg-spot"
 
   image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
 
