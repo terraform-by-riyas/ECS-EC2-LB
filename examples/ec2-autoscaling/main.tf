@@ -76,6 +76,8 @@ module "ecs_cluster" {
 module "ecs_service" {
   source = "../../modules/service"
 
+  desired_count = 2
+  
   # Service
   name        = local.name
   cluster_arn = module.ecs_cluster.arn
@@ -88,9 +90,9 @@ module "ecs_service" {
   requires_compatibilities = ["EC2"]
   scheduling_strategy = "REPLICA"
   capacity_provider_strategy = {
-    # On-demand instances
+    # spot instances
     ex-1 = {
-      capacity_provider = module.ecs_cluster.autoscaling_capacity_providers["ex-1"].name
+      capacity_provider = module.ecs_cluster.autoscaling_capacity_providers["ex-2"].name
       weight            = 1
       base              = 1
     }
@@ -227,7 +229,7 @@ module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 6.5"
 
-  for_each = {
+/*
     # On-demand instances
     ex-1 = {
       instance_type              = "t3.large"
@@ -243,6 +245,7 @@ module "autoscaling" {
         EOF
       EOT
     }
+*/
     # Spot instances
     ex-2 = {
       instance_type              = "t3.medium"
@@ -276,7 +279,7 @@ module "autoscaling" {
         EOF
       EOT
     }
-  }
+  
 
   name = "${local.name}-${each.key}"
 
