@@ -46,11 +46,11 @@ module "ecs_cluster" {
         base   = 20
       }
     }
-*/
+*/  name = "${local.name}-asg-spot"
 
     # Spot instances
     ex-2 = {
-      auto_scaling_group_arn         = module.autoscaling["ex-2"].autoscaling_group_arn
+      auto_scaling_group_arn         = module.autoscaling.autoscaling_group_arn
       managed_termination_protection = "ENABLED"
 
       managed_scaling = {
