@@ -247,7 +247,6 @@ module "autoscaling" {
     }
 */
     # Spot instances
-    ex-2 = {
       instance_type              = "t3.medium"
       use_mixed_instances_policy = true
       mixed_instances_policy = {
@@ -278,16 +277,16 @@ module "autoscaling" {
         ECS_ENABLE_SPOT_INSTANCE_DRAINING=true
         EOF
       EOT
-    }
+    
   
 
   name = "${local.name}-${each.key}"
 
   image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-  instance_type = each.value.instance_type
+
 
   security_groups                 = [module.autoscaling_sg.security_group_id]
-  user_data                       = base64encode(each.value.user_data)
+
   ignore_desired_capacity_changes = true
 
   create_iam_instance_profile = true
@@ -312,9 +311,7 @@ module "autoscaling" {
   # Required for  managed_termination_protection = "ENABLED"
   protect_from_scale_in = true
 
-  # Spot instances
-  use_mixed_instances_policy = each.value.use_mixed_instances_policy
-  mixed_instances_policy     = each.value.mixed_instances_policy
+
 
   tags = local.tags
 }
