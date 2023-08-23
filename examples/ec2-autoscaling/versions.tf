@@ -9,9 +9,10 @@ terraform {
 
 provider "aws" {
   region  = "us-east-1"
-  profile = "alignminds"
+ # profile = "alignminds"
 }
 
+/*
 terraform {
   backend "s3" {
     bucket                  = "am-rr-terraform-state-backend"
@@ -22,3 +23,5 @@ terraform {
     profile                 = "alignminds"
   }
 }
+
+*/
