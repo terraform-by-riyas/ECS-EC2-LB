@@ -10,8 +10,6 @@ locals {
   container_name = "ecs-sample"
   container_port = 80
 
-  target_groups = ["green","blue"]
-
   tags = {
     Name       = local.name
     Example    = local.name
@@ -299,7 +297,7 @@ module "autoscaling" {
   health_check_type   = "EC2"
   min_size            = 1
   max_size            = 2
-  desired_capacity    = 2
+  desired_capacity    = 1
 
   # https://github.com/hashicorp/terraform-provider-aws/issues/12582
   autoscaling_group_tags = {
