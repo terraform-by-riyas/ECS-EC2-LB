@@ -32,7 +32,7 @@ module "ecs_cluster" {
   default_capacity_provider_use_fargate = false
   autoscaling_capacity_providers = {
     # On-demand instances
-    ex-1 = {
+/*    ex-1 = {
       auto_scaling_group_arn         = module.autoscaling["ex-1"].autoscaling_group_arn
       managed_termination_protection = "ENABLED"
 
@@ -48,9 +48,11 @@ module "ecs_cluster" {
         base   = 20
       }
     }
+*/  name = "${local.name}-asg-spot"
+
     # Spot instances
     ex-2 = {
-      auto_scaling_group_arn         = module.autoscaling["ex-2"].autoscaling_group_arn
+      auto_scaling_group_arn         = module.autoscaling.autoscaling_group_arn
       managed_termination_protection = "ENABLED"
 
       managed_scaling = {
@@ -76,6 +78,8 @@ module "ecs_cluster" {
 module "ecs_service" {
   source = "../../modules/service"
 
+  desired_count = 2
+  
   # Service
   name        = local.name
   cluster_arn = module.ecs_cluster.arn
@@ -88,9 +92,9 @@ module "ecs_service" {
   requires_compatibilities = ["EC2"]
   scheduling_strategy = "REPLICA"
   capacity_provider_strategy = {
-    # On-demand instances
+    # spot instances
     ex-1 = {
-      capacity_provider = module.ecs_cluster.autoscaling_capacity_providers["ex-1"].name
+      capacity_provider = module.ecs_cluster.autoscaling_capacity_providers["ex-2"].name
       weight            = 1
       base              = 1
     }
@@ -227,7 +231,7 @@ module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 6.5"
 
-  for_each = {
+/*
     # On-demand instances
     ex-1 = {
       instance_type              = "t3.large"
@@ -243,8 +247,8 @@ module "autoscaling" {
         EOF
       EOT
     }
+*/
     # Spot instances
-    ex-2 = {
       instance_type              = "t3.medium"
       use_mixed_instances_policy = true
       mixed_instances_policy = {
@@ -275,16 +279,16 @@ module "autoscaling" {
         ECS_ENABLE_SPOT_INSTANCE_DRAINING=true
         EOF
       EOT
-    }
-  }
+    
+  
 
-  name = "${local.name}-${each.key}"
+  name = "${local.name}-asg-spot"
 
   image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-  instance_type = each.value.instance_type
+
 
   security_groups                 = [module.autoscaling_sg.security_group_id]
-  user_data                       = base64encode(each.value.user_data)
+
   ignore_desired_capacity_changes = true
 
   create_iam_instance_profile = true
@@ -309,9 +313,7 @@ module "autoscaling" {
   # Required for  managed_termination_protection = "ENABLED"
   protect_from_scale_in = true
 
-  # Spot instances
-  use_mixed_instances_policy = each.value.use_mixed_instances_policy
-  mixed_instances_policy     = each.value.mixed_instances_policy
+
 
   tags = local.tags
 }
