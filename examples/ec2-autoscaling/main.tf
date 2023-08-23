@@ -227,20 +227,21 @@ module "autoscaling" {
 
   for_each = {
     # On-demand instances
-    ex-1 = {
-      instance_type              = "t3.large"
-      use_mixed_instances_policy = false
-      mixed_instances_policy     = {}
-      user_data                  = <<-EOT
-        #!/bin/bash
-        cat <<'EOF' >> /etc/ecs/ecs.config
-        ECS_CLUSTER=${local.name}
-        ECS_LOGLEVEL=debug
-        ECS_CONTAINER_INSTANCE_TAGS=${jsonencode(local.tags)}
-        ECS_ENABLE_TASK_IAM_ROLE=true
-        EOF
-      EOT
-    }
+    # ex-1 = {
+    #   instance_type              = "t3.large"
+    #   use_mixed_instances_policy = false
+    #   mixed_instances_policy     = {}
+    #   user_data                  = <<-EOT
+    #     #!/bin/bash
+    #     cat <<'EOF' >> /etc/ecs/ecs.config
+    #     ECS_CLUSTER=${local.name}
+    #     ECS_LOGLEVEL=debug
+    #     ECS_CONTAINER_INSTANCE_TAGS=${jsonencode(local.tags)}
+    #     ECS_ENABLE_TASK_IAM_ROLE=true
+    #     EOF
+    #   EOT
+    # }
+    
     # Spot instances
     ex-2 = {
       instance_type              = "t3.medium"
